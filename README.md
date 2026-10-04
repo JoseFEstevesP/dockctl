@@ -19,7 +19,7 @@ servicio systemd, ni un backend externo.
 La última versión se publica en la pestaña **Releases** con el código fuente
 comprimido (`.tar.gz` / `.zip`).
 
-[Ir a los releases](https://github.com/JoseFEstevesP/plasma-dockctl/releases)
+[Ir a los releases](https://github.com/JoseFEstevesP/dockctl/releases)
 
 ## Funcionalidades
 
@@ -148,8 +148,8 @@ sudo usermod -aG docker "$USER"
 ### Paso 1 — Clonar el repositorio
 
 ```bash
-git clone https://github.com/JoseFEstevesP/plasma-dockctl
-cd plasma-dockctl
+git clone https://github.com/JoseFEstevesP/dockctl
+cd dockctl
 ```
 
 ### Paso 2 — Instalar
@@ -161,7 +161,7 @@ cd plasma-dockctl
 O en una sola línea:
 
 ```bash
-git clone https://github.com/JoseFEstevesP/plasma-dockctl && cd plasma-dockctl && ./install.sh
+git clone https://github.com/JoseFEstevesP/dockctl && cd dockctl && ./install.sh
 ```
 
 El instalador hace lo siguiente:
@@ -309,7 +309,7 @@ QT_QPA_PLATFORM=offscreen python3 app/dockctl_app.py
 Estructura:
 
 ```
-plasma-dockctl/
+dockctl/
 ├── app/
 │   ├── dockctl_app.py              # Proceso principal: backend + bandeja + QML
 │   ├── org.gato99.dockctl.desktop  # Entrada de menú
