@@ -26,7 +26,7 @@ Item {
             onRefreshRequested: stackPage.refreshRequested()
 
             ChipButton {
-                text: stackPage.stack ? i18n("Reiniciar · %1", stackPage.stack.containers.length) : ""
+                text: stackPage.stack ? qsTr("Reiniciar · %1").arg(stackPage.stack.containers.length) : ""
                 icon: Qt.resolvedUrl("../images/icons/refresh.svg")
                 accent: true
                 onClicked: stackPage.restartAll()
@@ -46,7 +46,7 @@ Item {
 
             Text {
                 anchors.centerIn: parent
-                text: i18n("Sin contenedores en este stack")
+                text: qsTr("Sin contenedores en este stack")
                 color: DS.subText
                 font.pixelSize: Kirigami.Theme.defaultFont.pixelSize
             }

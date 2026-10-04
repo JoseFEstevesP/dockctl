@@ -119,19 +119,19 @@ Item {
 
         PageHeader {
             title: logPage.containerName
-            backTooltip: i18n("Volver al detalle")
+            backTooltip: qsTr("Volver al detalle")
             showRefresh: false
             onBack: logPage.back()
             onRefreshRequested: logPage.refreshRequested()
 
             ChipButton {
-                text: i18n("Actualizar")
+                text: qsTr("Actualizar")
                 icon: Qt.resolvedUrl("../images/icons/refresh.svg")
                 onClicked: logPage.refreshRequested()
             }
 
             ChipButton {
-                text: i18n("Copiar")
+                text: qsTr("Copiar")
                 icon: Qt.resolvedUrl("../images/icons/copy.svg")
                 enabled: logPage.logs !== ""
                 accent: true
@@ -164,7 +164,7 @@ Item {
             Text {
                 Layout.fillWidth: true
                 visible: logPage.hiddenCount() > 0
-                text: i18n("%1 líneas ocultas", logPage.hiddenCount())
+                text: qsTr("%1 líneas ocultas").arg(logPage.hiddenCount())
                 color: DS.faint
                 font.pixelSize: 10
                 elide: Text.ElideRight
@@ -179,7 +179,7 @@ Item {
             Text {
                 anchors.centerIn: parent
                 visible: logPage.loading
-                text: i18n("Cargando logs…")
+                text: qsTr("Cargando logs…")
                 color: DS.subText
                 font.pixelSize: Kirigami.Theme.defaultFont.pixelSize
             }
@@ -199,8 +199,8 @@ Item {
                 anchors.centerIn: parent
                 visible: !logPage.loading && logPage.error === "" && logPage.logs === ""
                 text: logPage.containerName !== ""
-                        ? i18n("%1 no ha escrito nada en sus logs", logPage.containerName)
-                        : i18n("Sin logs")
+                        ? qsTr("%1 no ha escrito nada en sus logs").arg(logPage.containerName)
+                        : qsTr("Sin logs")
                 color: DS.subText
                 width: parent.width - Kirigami.Units.largeSpacing * 2
                 wrapMode: Text.WordWrap
@@ -212,7 +212,7 @@ Item {
                 anchors.centerIn: parent
                 visible: !logPage.loading && logPage.error === "" && logPage.logs !== ""
                     && logPage.levelFilter !== "all" && logPage.tokens().length === 0
-                text: i18n("Ninguna línea de ese nivel")
+                text: qsTr("Ninguna línea de ese nivel")
                 color: DS.subText
                 font.pixelSize: Kirigami.Theme.defaultFont.pixelSize
             }

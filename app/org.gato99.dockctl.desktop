@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Contenedores Docker
+GenericName=Gestor de contenedores Docker
+Comment=Ver y gestionar contenedores Docker desde la bandeja del sistema
+Exec=dockctl
+Icon=dockctl
+Terminal=false
+Categories=System;Monitor;
+Keywords=docker;containers;contenedores;
+StartupNotify=false

@@ -10,8 +10,8 @@ RowLayout {
     default property alias extraActions: extraArea.data
 
     property string title: ""
-    property string backTooltip: i18n("Volver")
-    property string refreshTooltip: i18n("Actualizar")
+    property string backTooltip: qsTr("Volver")
+    property string refreshTooltip: qsTr("Actualizar")
     property bool showRefresh: true
 
     signal back()

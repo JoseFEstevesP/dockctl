@@ -60,7 +60,7 @@ Item {
             Text {
                 anchors.centerIn: parent
                 visible: detailPage.loading
-                text: i18n("Cargando detalles…")
+                text: qsTr("Cargando detalles…")
                 color: DS.subText
                 font.pixelSize: Kirigami.Theme.defaultFont.pixelSize
             }
@@ -111,7 +111,7 @@ Item {
                                 var d = detailPage.detailData;
                                 var s = d.state || "";
                                 if (d.health) {
-                                    s += "  ·  " + (d.health === "healthy" ? i18n("saludable") : d.health);
+                                    s += "  ·  " + (d.health === "healthy" ? qsTr("saludable") : d.health);
                                 }
                                 return s;
                             }
@@ -123,7 +123,7 @@ Item {
 
                     Text {
                         visible: detailPage.diagnostics.length > 0
-                        text: i18n("Diagnóstico")
+                        text: qsTr("Diagnóstico")
                         font.bold: true
                         color: DS.text
                         font.pixelSize: Kirigami.Theme.smallFont.pixelSize
@@ -152,15 +152,15 @@ Item {
                         }
                     }
 
-                    InfoLine { label: i18n("Imagen"); value: detailPage.detailData ? detailPage.detailData.image : "" }
-                    InfoLine { label: i18n("Stack"); value: detailPage.detailData && detailPage.detailData.stack ? detailPage.detailData.stack : "—" }
-                    InfoLine { label: i18n("Reinicios"); value: detailPage.detailData ? String(detailPage.detailData.restartCount) : "0" }
-                    InfoLine { label: i18n("Creado"); value: detailPage.detailData ? detailPage.detailData.created : "" }
-                    InfoLine { label: i18n("Iniciado"); value: detailPage.detailData ? detailPage.detailData.startedAt : "" }
+                    InfoLine { label: qsTr("Imagen"); value: detailPage.detailData ? detailPage.detailData.image : "" }
+                    InfoLine { label: qsTr("Stack"); value: detailPage.detailData && detailPage.detailData.stack ? detailPage.detailData.stack : "—" }
+                    InfoLine { label: qsTr("Reinicios"); value: detailPage.detailData ? String(detailPage.detailData.restartCount) : "0" }
+                    InfoLine { label: qsTr("Creado"); value: detailPage.detailData ? detailPage.detailData.created : "" }
+                    InfoLine { label: qsTr("Iniciado"); value: detailPage.detailData ? detailPage.detailData.startedAt : "" }
 
                     Text {
                         visible: detailPage.detailData && (detailPage.detailData.ips || []).length === 0
-                        text: i18n("Sin IP de red propia")
+                        text: qsTr("Sin IP de red propia")
                         color: DS.subText
                         font.pixelSize: Kirigami.Theme.smallFont.pixelSize
                     }
@@ -175,7 +175,7 @@ Item {
 
                     Text {
                         visible: detailPage.detailData && (detailPage.detailData.ports || []).length > 0
-                        text: i18n("Puertos")
+                        text: qsTr("Puertos")
                         font.bold: true
                         color: DS.text
                         font.pixelSize: Kirigami.Theme.smallFont.pixelSize
@@ -192,7 +192,7 @@ Item {
 
                     Text {
                         visible: detailPage.detailData && (detailPage.detailData.ports || []).length === 0
-                        text: i18n("Sin puertos publicados")
+                        text: qsTr("Sin puertos publicados")
                         color: DS.subText
                         font.pixelSize: Kirigami.Theme.smallFont.pixelSize
                     }
@@ -217,8 +217,8 @@ Item {
 
                 ChipButton {
                     text: detailPage.detailData && detailPage.detailData.running
-                            ? i18n("Parar")
-                            : i18n("Iniciar")
+                            ? qsTr("Parar")
+                            : qsTr("Iniciar")
                     icon: detailPage.detailData && detailPage.detailData.running
                                 ? Qt.resolvedUrl("../images/icons/stop.svg")
                                 : Qt.resolvedUrl("../images/icons/play.svg")
@@ -228,26 +228,26 @@ Item {
                 }
 
                 ChipButton {
-                    text: i18n("Reiniciar")
+                    text: qsTr("Reiniciar")
                     icon: Qt.resolvedUrl("../images/icons/refresh.svg")
                     onClicked: detailPage.requestAction(detailPage.container.name, "restart")
                 }
 
                 ChipButton {
-                    text: i18n("Eliminar")
+                    text: qsTr("Eliminar")
                     icon: Qt.resolvedUrl("../images/icons/trash.svg")
                     onClicked: detailPage.requestAction(detailPage.container.name, "remove")
                 }
 
                 ChipButton {
-                    text: i18n("Procesos")
+                    text: qsTr("Procesos")
                     icon: Qt.resolvedUrl("../images/icons/list.svg")
                     visible: detailPage.detailData && detailPage.detailData.running
                     onClicked: detailPage.topRequested()
                 }
 
                 ChipButton {
-                    text: i18n("Ver logs")
+                    text: qsTr("Ver logs")
                     icon: Qt.resolvedUrl("../images/icons/logs.svg")
                     onClicked: detailPage.openLogs(detailPage.container.name)
                 }

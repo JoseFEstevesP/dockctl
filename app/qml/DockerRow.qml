@@ -88,26 +88,26 @@ Item {
             IconButton {
                 visible: delegate.container.running
                 icon: Qt.resolvedUrl("../images/icons/stop.svg")
-                tooltip: i18n("Parar")
+                tooltip: qsTr("Parar")
                 onClicked: delegate.requestAction(delegate.container.name, "stop")
             }
 
             IconButton {
                 visible: !delegate.container.running
                 icon: Qt.resolvedUrl("../images/icons/play.svg")
-                tooltip: i18n("Iniciar")
+                tooltip: qsTr("Iniciar")
                 onClicked: delegate.requestAction(delegate.container.name, "start")
             }
 
             IconButton {
                 icon: Qt.resolvedUrl("../images/icons/refresh.svg")
-                tooltip: i18n("Reiniciar")
+                tooltip: qsTr("Reiniciar")
                 onClicked: delegate.requestAction(delegate.container.name, "restart")
             }
 
             IconButton {
                 icon: Qt.resolvedUrl("../images/icons/trash.svg")
-                tooltip: i18n("Eliminar")
+                tooltip: qsTr("Eliminar")
                 onClicked: delegate.requestAction(delegate.container.name, "remove")
             }
         }
