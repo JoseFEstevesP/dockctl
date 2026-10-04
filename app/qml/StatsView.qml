@@ -60,14 +60,14 @@ Item {
         case "disk":
             return item.blockIo || "";
         case "pids":
-            return i18n("%1 procesos", item.pids || 0);
+            return qsTr("%1 procesos").arg(item.pids || 0);
         default:
             return (item.cpu || 0).toFixed(2) + " %";
         }
     }
 
     function secondaryText(item) {
-        return i18n("RAM %1 · %2 procs.", item.memUsage || "—", item.pids || 0);
+        return qsTr("RAM %1 · %2 procs.").arg(item.memUsage || "—").arg(item.pids || 0);
     }
 
     function barColor(item) {
@@ -110,7 +110,7 @@ Item {
 
     function fmtAge(seconds) {
         var s = Math.max(0, Math.round(seconds || 0));
-        return s < 60 ? i18n("hace %1 s", s) : i18n("hace %1 min", Math.round(s / 60));
+        return s < 60 ? qsTr("hace %1 s").arg(s) : qsTr("hace %1 min").arg(Math.round(s / 60));
     }
 
     function sorted() {
@@ -129,7 +129,7 @@ Item {
         spacing: Kirigami.Units.smallSpacing
 
         PageHeader {
-            title: i18n("Consumo")
+            title: qsTr("Consumo")
             onBack: statsPage.back()
             onRefreshRequested: statsPage.refreshRequested()
         }
@@ -174,10 +174,10 @@ Item {
                 spacing: 2
 
                 Text {
-                    text: i18n("%1 en marcha · CPU %2 · RAM %3",
-                        statsPage.total.count || 0,
-                        (statsPage.total.cpu || 0).toFixed(1) + " %",
-                        statsPage.fmtBytes(statsPage.total.memBytes))
+                    text: qsTr("%1 en marcha · CPU %2 · RAM %3")
+                        .arg(statsPage.total.count || 0)
+                        .arg((statsPage.total.cpu || 0).toFixed(1) + " %")
+                        .arg(statsPage.fmtBytes(statsPage.total.memBytes))
                     color: DS.text
                     font.bold: true
                     font.pixelSize: 12
@@ -187,8 +187,8 @@ Item {
 
                 Text {
                     visible: statsPage.available
-                    text: i18n("%1 procesos · %2", statsPage.total.pids || 0,
-                        statsPage.fmtAge(statsPage.meta ? statsPage.meta.age : 0))
+                    text: qsTr("%1 procesos · %2").arg(statsPage.total.pids || 0)
+                        .arg(statsPage.fmtAge(statsPage.meta ? statsPage.meta.age : 0))
                     color: DS.faint
                     font.pixelSize: 10
                     elide: Text.ElideRight
@@ -204,7 +204,7 @@ Item {
             Text {
                 anchors.centerIn: parent
                 visible: statsPage.loading
-                text: i18n("Midiendo consumo…")
+                text: qsTr("Midiendo consumo…")
                 color: DS.subText
                 font.pixelSize: Kirigami.Theme.defaultFont.pixelSize
             }
@@ -224,7 +224,7 @@ Item {
                 anchors.centerIn: parent
                 visible: !statsPage.loading && statsPage.error === ""
                         && statsPage.available && statsPage.stats.length === 0
-                text: i18n("Sin contenedores en marcha")
+                text: qsTr("Sin contenedores en marcha")
                 color: DS.subText
                 font.pixelSize: Kirigami.Theme.defaultFont.pixelSize
             }
@@ -232,7 +232,7 @@ Item {
             Text {
                 anchors.centerIn: parent
                 visible: !statsPage.loading && statsPage.error === "" && !statsPage.available
-                text: i18n("Este sistema no permite medir el consumo.\ndocker stats necesita cgroups v2 y permisos sobre el socket.")
+                text: qsTr("Este sistema no permite medir el consumo.\ndocker stats necesita cgroups v2 y permisos sobre el socket.")
                 color: DS.subText
                 width: parent.width - Kirigami.Units.largeSpacing * 2
                 wrapMode: Text.WordWrap

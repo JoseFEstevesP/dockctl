@@ -1,16 +1,25 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Genera el paquete instalable del widget: dist/org.gato99.dockctl.plasmoid (ZIP)
+# Genera los paquetes de codigo fuente: dist/dockctl-v<version>.tar.gz y .zip
 cd "$(dirname "${BASH_SOURCE[0]}")"
+ROOT="$PWD"
+NAME="$(basename "${ROOT}")"
+
+VERSION="$(cat VERSION 2>/dev/null || true)"
+if [ -z "${VERSION}" ]; then
+    VERSION="$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || echo "1.0")"
+fi
 
 mkdir -p dist
-rm -f dist/org.gato99.dockctl.plasmoid
+rm -f "dist/dockctl-v${VERSION}.tar.gz" "dist/dockctl-v${VERSION}.zip"
 
-cd plasmoid
-zip -qr ../dist/org.gato99.dockctl.plasmoid metadata.json contents
+tar --exclude=.git --exclude=dist --exclude=__pycache__ --exclude='*.pyc' \
+    -czf "dist/dockctl-v${VERSION}.tar.gz" -C "${ROOT}/.." "${NAME}"
+(cd "${ROOT}/.." && zip -qr "${ROOT}/dist/dockctl-v${VERSION}.zip" "${NAME}" \
+    -x "${NAME}/.git/*" -x "${NAME}/dist/*" \
+    -x "*/__pycache__/*" -x "*.pyc")
 
-cd ..
-echo "paquete generado: dist/org.gato99.dockctl.plasmoid"
-echo "instalar (GUI):  panel -> Añadir widgets -> Instalar desde archivo local..."
-echo "instalar (CLI):  kpackagetool6 -t Plasma/Applet -i dist/org.gato99.dockctl.plasmoid"
+echo "paquetes generados (v${VERSION}):"
+echo "  dist/dockctl-v${VERSION}.tar.gz"
+echo "  dist/dockctl-v${VERSION}.zip"

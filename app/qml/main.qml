@@ -1,20 +1,19 @@
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
-import org.kde.plasma.core as PlasmaCore
-import org.kde.plasma.plasmoid
 import "DockStyle.js" as DS
 
-PlasmoidItem {
+ApplicationWindow {
     id: root
 
-    Plasmoid.status: PlasmaCore.Types.PassiveStatus
-    Plasmoid.icon: "docker"
-    toolTipMainText: i18n("Contenedores Docker")
-    toolTipSubText: root.lastError
-        ? i18n("Backend no disponible")
-        : i18n("%1 en marcha · %2 detenidos", root.runningCount, root.stoppedCount)
-    hideOnWindowDeactivate: true
+    visible: !dockctlStartHidden
+    title: qsTr("Contenedores Docker")
+    width: 430
+    height: 560
+    minimumWidth: 360
+    minimumHeight: 300
+    color: DS.cardBg
 
     property int runningCount: 0
     property int stoppedCount: 0
@@ -25,11 +24,7 @@ PlasmoidItem {
     property bool busy: false
     property var pendingConfirm: null
     property string lastError: ""
-    property string backendUrl: "http://127.0.0.1:" + (plasmoid.configuration.backendPort || 8427)
-
-    readonly property int maxPopupHeight: Math.round(Screen.height * 0.7)
-    readonly property int minPopupHeight: 140
-    readonly property int fixedContentHeight: 400
+    property string backendUrl: dockctlBackendUrl
 
     property int currentPage: 0
     property var currentContainer: null
@@ -52,28 +47,30 @@ PlasmoidItem {
     property bool topLoading: false
     property string topError: ""
 
-    compactRepresentation: CompactRepresentation {}
+    SettingsDialog {
+        id: settingsDialog
+        objectName: "settingsDialog"
+    }
 
-    Plasmoid.backgroundHints: PlasmaCore.Types.NoBackground
+    onClosing: function(close) {
+        if (dockctlTrayAvailable) {
+            close.accepted = false;
+            root.hide();
+        } else {
+            Qt.quit();
+        }
+    }
 
-    fullRepresentation: Rectangle {
+    Component.onCompleted: {
+        root.fetchContainers();
+        root.fetchStats(false);
+    }
+
+    Rectangle {
         id: popupBody
-        implicitWidth: 430
+        anchors.fill: parent
         clip: true
         color: DS.cardBg
-        radius: 8
-        border.width: 1
-        border.color: DS.border
-
-        readonly property int marginTotal: Kirigami.Units.largeSpacing * 2
-        readonly property int sepHeight: Kirigami.Units.smallSpacing * 2
-        readonly property int contentHeight: root.currentPage === 0
-            ? Math.max(48, rowsCol.implicitHeight)
-            : root.fixedContentHeight
-
-        implicitHeight: Math.max(root.minPopupHeight, Math.min(root.maxPopupHeight,
-            marginTotal + headerRow.implicitHeight + sepHeight + contentHeight
-            + (errRow.visible ? errRow.implicitHeight : 0)))
 
         ColumnLayout {
             id: bodyLayout
@@ -112,7 +109,7 @@ PlasmoidItem {
 
                     ChipButton {
                         id: statsChip
-                        visible: plasmoid.configuration.showStatsChip !== false
+                        visible: config.showStatsChip !== false
                             && root.currentPage === 0 && root.statsMeta !== null
                             && root.statsMeta.available === true
                             && root.statsList.length > 0
@@ -124,26 +121,25 @@ PlasmoidItem {
 
                     IconButton {
                         icon: Qt.resolvedUrl("../images/icons/chart.svg")
-                        tooltip: i18n("Consumo")
+                        tooltip: qsTr("Consumo")
                         onClicked: root.openStats()
                     }
 
                     IconButton {
                         icon: Qt.resolvedUrl("../images/icons/sparkle.svg")
-                        tooltip: i18n("Análisis")
+                        tooltip: qsTr("Análisis")
                         onClicked: root.openAnalysis()
                     }
 
                     IconButton {
                         icon: Qt.resolvedUrl("../images/icons/gear.svg")
-                        tooltip: i18n("Configurar widget")
-                        onClicked: Plasmoid.internalAction("configure").trigger()
+                        tooltip: qsTr("Configurar")
+                        onClicked: settingsDialog.open()
                     }
 
-
-IconButton {
+                    IconButton {
                         icon: Qt.resolvedUrl("../images/icons/refresh.svg")
-                        tooltip: i18n("Actualizar")
+                        tooltip: qsTr("Actualizar")
                         onClicked: root.fetchContainers()
                     }
                 }
@@ -189,7 +185,7 @@ IconButton {
                             Layout.fillWidth: true
                             Text {
                                 anchors.centerIn: parent
-                                text: i18n("Cargando contenedores…")
+                                text: qsTr("Cargando contenedores…")
                                 color: DS.subText
                                 font.pixelSize: Kirigami.Theme.defaultFont.pixelSize
                             }
@@ -201,7 +197,7 @@ IconButton {
                             Layout.fillWidth: true
                             Text {
                                 anchors.centerIn: parent
-                                text: i18n("Sin contenedores")
+                                text: qsTr("Sin contenedores")
                                 color: DS.subText
                                 font.pixelSize: Kirigami.Theme.defaultFont.pixelSize
                             }
@@ -213,7 +209,7 @@ IconButton {
                             Layout.fillWidth: true
                             Text {
                                 anchors.centerIn: parent
-                                text: i18n("Ninguno en marcha")
+                                text: qsTr("Ninguno en marcha")
                                 color: DS.subText
                                 font.pixelSize: Kirigami.Theme.defaultFont.pixelSize
                             }
@@ -317,7 +313,7 @@ IconButton {
                 }
 
                 ChipButton {
-                    text: i18n("Reintentar")
+                    text: qsTr("Reintentar")
                     accent: true
                     onClicked: root.fetchContainers()
                 }
@@ -333,7 +329,7 @@ IconButton {
 
             Text {
                 anchors.centerIn: parent
-                text: i18n("Ejecutando…")
+                text: qsTr("Ejecutando…")
                 color: DS.text
                 font.pixelSize: Kirigami.Theme.defaultFont.pixelSize
             }
@@ -373,7 +369,7 @@ IconButton {
                     spacing: Kirigami.Units.smallSpacing
 
                     ChipButton {
-                        text: i18n("Cancelar")
+                        text: qsTr("Cancelar")
                         onClicked: root.pendingConfirm = null
                     }
 
@@ -395,9 +391,9 @@ IconButton {
 
     Timer {
         id: pollTimer
-        interval: Math.max(1, (plasmoid.configuration.refreshInterval || 5)) * 1000
+        interval: Math.max(1, (config.refreshInterval || 5)) * 1000
         repeat: true
-        running: root.expanded
+        running: root.visible
         onTriggered: root.fetchContainers()
     }
 
@@ -405,35 +401,31 @@ IconButton {
     // y el backend cachea 10s para que pulsar a la vez no dispare dos procesos.
     Timer {
         id: statsTimer
-        interval: Math.max(5, Math.min(120, plasmoid.configuration.statsInterval || 10)) * 1000
+        interval: Math.max(5, Math.min(120, config.statsInterval || 10)) * 1000
         repeat: true
-        running: root.expanded && root.currentPage === 4
+        running: root.visible && root.currentPage === 4
         onTriggered: root.fetchStats(false)
     }
 
     Connections {
-        target: plasmoid.configuration
+        target: config
         function onShowStoppedChanged() {
             root.buildStacks();
-        }
-        function onBackendPortChanged() {
-            root.backendUrl = "http://127.0.0.1:" + (plasmoid.configuration.backendPort || 8427);
-            root.fetchContainers();
         }
         function onStatsIntervalChanged() {
             statsTimer.restart();
         }
     }
 
-    onExpandedChanged: {
-        if (plasmoid.expanded) {
+    onVisibleChanged: {
+        if (root.visible) {
             root.fetchContainers();
             root.fetchStats(false);
         }
     }
 
     function buildStacks() {
-        var showStopped = plasmoid.configuration.showStopped !== false;
+        var showStopped = config.showStopped !== false;
         var groups = {};
         var order = [];
         for (var i = 0; i < root.containers.length; i++) {
@@ -457,7 +449,7 @@ IconButton {
             var g = groups[k];
             arr.push({
                 key: k,
-                title: k ? k : i18n("Otros"),
+                title: k ? k : qsTr("Otros"),
                 containers: g.containers,
                 running: g.running,
                 total: g.containers.length
@@ -521,29 +513,29 @@ IconButton {
             }
             root.detailLoading = false;
             if (xhr.status !== 200) {
-                root.detailError = i18n("No se pudo obtener el detalle");
+                root.detailError = qsTr("No se pudo obtener el detalle");
                 return;
             }
             var d;
             try {
                 d = JSON.parse(xhr.responseText);
             } catch (err) {
-                root.detailError = i18n("Respuesta inválida");
+                root.detailError = qsTr("Respuesta inválida");
                 return;
             }
             if (d.ok) {
                 root.detailData = d.detail;
             } else {
-                root.detailError = d.error || i18n("Error del backend");
+                root.detailError = d.error || qsTr("Error del backend");
             }
         };
         xhr.ontimeout = function() {
             root.detailLoading = false;
-            root.detailError = i18n("Tiempo de espera agotado");
+            root.detailError = qsTr("Tiempo de espera agotado");
         };
         xhr.onerror = function() {
             root.detailLoading = false;
-            root.detailError = i18n("Sin conexión con el backend");
+            root.detailError = qsTr("Sin conexión con el backend");
         };
         xhr.send();
     }
@@ -570,29 +562,29 @@ IconButton {
             }
             root.logsLoading = false;
             if (xhr.status !== 200) {
-                root.logsError = i18n("No se pudieron leer los logs");
+                root.logsError = qsTr("No se pudieron leer los logs");
                 return;
             }
             var d;
             try {
                 d = JSON.parse(xhr.responseText);
             } catch (err) {
-                root.logsError = i18n("Respuesta inválida");
+                root.logsError = qsTr("Respuesta inválida");
                 return;
             }
             if (d.ok) {
                 root.logs = d.logs || "";
             } else {
-                root.logsError = d.error || i18n("Error del backend");
+                root.logsError = d.error || qsTr("Error del backend");
             }
         };
         xhr.ontimeout = function() {
             root.logsLoading = false;
-            root.logsError = i18n("Tiempo de espera agotado");
+            root.logsError = qsTr("Tiempo de espera agotado");
         };
         xhr.onerror = function() {
             root.logsLoading = false;
-            root.logsError = i18n("Sin conexión con el backend");
+            root.logsError = qsTr("Sin conexión con el backend");
         };
         xhr.send();
     }
@@ -609,12 +601,12 @@ IconButton {
             }
             root.loading = false;
             if (xhr.status !== 200) {
-                root.lastError = i18n("Servicio backend no disponible");
+                root.lastError = qsTr("Servicio backend no disponible");
                 return;
             }
             var d = JSON.parse(xhr.responseText);
             if (!d.ok) {
-                root.lastError = d.error || i18n("Error del backend");
+                root.lastError = d.error || qsTr("Error del backend");
                 return;
             }
             root.lastError = "";
@@ -640,21 +632,21 @@ IconButton {
         };
         xhr.ontimeout = function() {
             root.loading = false;
-            root.lastError = i18n("Tiempo de espera agotado");
+            root.lastError = qsTr("Tiempo de espera agotado");
         };
         xhr.onerror = function() {
             root.loading = false;
-            root.lastError = i18n("Sin conexión con el backend");
+            root.lastError = qsTr("Sin conexión con el backend");
         };
         xhr.send();
     }
 
     function headerTitle() {
         if (root.currentPage === 4) {
-            return i18n("Consumo");
+            return qsTr("Consumo");
         }
         if (root.currentPage === 5) {
-            return i18n("Análisis");
+            return qsTr("Análisis");
         }
         if (root.currentPage === 3 && root.currentStack) {
             return root.currentStack.title;
@@ -663,7 +655,7 @@ IconButton {
                 && root.currentContainer) {
             return root.currentContainer.name;
         }
-        return i18n("Contenedores");
+        return qsTr("Contenedores");
     }
 
     function statsChipText() {
@@ -710,18 +702,18 @@ IconButton {
             }
             root.statsLoading = false;
             if (xhr.status !== 200) {
-                root.statsError = i18n("No se pudo medir el consumo");
+                root.statsError = qsTr("No se pudo medir el consumo");
                 return;
             }
             var d;
             try {
                 d = JSON.parse(xhr.responseText);
             } catch (err) {
-                root.statsError = i18n("Respuesta inválida");
+                root.statsError = qsTr("Respuesta inválida");
                 return;
             }
             if (d.ok === false) {
-                root.statsError = d.error || i18n("Error del backend");
+                root.statsError = d.error || qsTr("Error del backend");
                 return;
             }
             root.statsError = "";
@@ -730,11 +722,11 @@ IconButton {
         };
         xhr.ontimeout = function() {
             root.statsLoading = false;
-            root.statsError = i18n("Tiempo de espera agotado");
+            root.statsError = qsTr("Tiempo de espera agotado");
         };
         xhr.onerror = function() {
             root.statsLoading = false;
-            root.statsError = i18n("Sin conexión con el backend");
+            root.statsError = qsTr("Sin conexión con el backend");
         };
         xhr.send();
     }
@@ -754,18 +746,18 @@ IconButton {
             }
             root.analysisLoading = false;
             if (xhr.status !== 200) {
-                root.analysisError = i18n("No se pudo completar el análisis");
+                root.analysisError = qsTr("No se pudo completar el análisis");
                 return;
             }
             var d;
             try {
                 d = JSON.parse(xhr.responseText);
             } catch (err) {
-                root.analysisError = i18n("Respuesta inválida");
+                root.analysisError = qsTr("Respuesta inválida");
                 return;
             }
             if (d.ok === false) {
-                root.analysisError = d.error || i18n("Error del backend");
+                root.analysisError = d.error || qsTr("Error del backend");
                 return;
             }
             root.analysisError = "";
@@ -773,11 +765,11 @@ IconButton {
         };
         xhr.ontimeout = function() {
             root.analysisLoading = false;
-            root.analysisError = i18n("Tiempo de espera agotado");
+            root.analysisError = qsTr("Tiempo de espera agotado");
         };
         xhr.onerror = function() {
             root.analysisLoading = false;
-            root.analysisError = i18n("Sin conexión con el backend");
+            root.analysisError = qsTr("Sin conexión con el backend");
         };
         xhr.send();
     }
@@ -800,29 +792,29 @@ IconButton {
             }
             root.topLoading = false;
             if (xhr.status !== 200) {
-                root.topError = i18n("No se pudieron leer los procesos");
+                root.topError = qsTr("No se pudieron leer los procesos");
                 return;
             }
             var d;
             try {
                 d = JSON.parse(xhr.responseText);
             } catch (err) {
-                root.topError = i18n("Respuesta inválida");
+                root.topError = qsTr("Respuesta inválida");
                 return;
             }
             if (d.ok === false) {
-                root.topError = d.error || i18n("Error del backend");
+                root.topError = d.error || qsTr("Error del backend");
                 return;
             }
             root.topData = d.top || null;
         };
         xhr.ontimeout = function() {
             root.topLoading = false;
-            root.topError = i18n("Tiempo de espera agotado");
+            root.topError = qsTr("Tiempo de espera agotado");
         };
         xhr.onerror = function() {
             root.topLoading = false;
-            root.topError = i18n("Sin conexión con el backend");
+            root.topError = qsTr("Sin conexión con el backend");
         };
         xhr.send();
     }
@@ -855,7 +847,7 @@ IconButton {
                 d = JSON.parse(xhr.responseText);
             } catch (e) {}
             if (xhr.status !== 200 || !d || d.ok === false) {
-                root.lastError = (d && d.error) || i18n("No se pudo completar la limpieza");
+                root.lastError = (d && d.error) || qsTr("No se pudo completar la limpieza");
             } else {
                 root.lastError = "";
             }
@@ -864,11 +856,11 @@ IconButton {
         };
         xhr.ontimeout = function() {
             root.busy = false;
-            root.lastError = i18n("Tiempo de espera agotado");
+            root.lastError = qsTr("Tiempo de espera agotado");
         };
         xhr.onerror = function() {
             root.busy = false;
-            root.lastError = i18n("Sin conexión con el backend");
+            root.lastError = qsTr("Sin conexión con el backend");
         };
         xhr.send();
     }
@@ -877,11 +869,11 @@ IconButton {
         if (root.busy) {
             return;
         }
-        if (action === "remove" && plasmoid.configuration.confirmRemove) {
+        if (action === "remove" && config.confirmRemove) {
             root.pendingConfirm = {
-                title: i18n("¿Eliminar el contenedor «%1»?", name),
-                subtitle: i18n("Esta acción es irreversible."),
-                confirmText: i18n("Eliminar"),
+                title: qsTr("¿Eliminar el contenedor «%1»?").arg(name),
+                subtitle: qsTr("Esta acción es irreversible."),
+                confirmText: qsTr("Eliminar"),
                 run: function() { root.doAction(name, "remove"); }
             };
             return;
@@ -895,9 +887,9 @@ IconButton {
         }
         var st = root.currentStack;
         root.pendingConfirm = {
-            title: i18n("¿Reiniciar todos los contenedores de «%1»?", st.title),
-            subtitle: i18n("Se reiniciarán %1 contenedores del stack.", st.containers.length),
-            confirmText: i18n("Reiniciar"),
+            title: qsTr("¿Reiniciar todos los contenedores de «%1»?").arg(st.title),
+            subtitle: qsTr("Se reiniciarán %1 contenedores del stack.").arg(st.containers.length),
+            confirmText: qsTr("Reiniciar"),
             run: function() { root.doRestartAll(st.key); }
         };
     }
@@ -914,12 +906,12 @@ IconButton {
             }
             root.busy = false;
             if (xhr.status !== 200) {
-                root.lastError = i18n("No se pudo reiniciar el stack");
+                root.lastError = qsTr("No se pudo reiniciar el stack");
             } else {
                 try {
                     var d = JSON.parse(xhr.responseText);
                     if (d.failed && d.failed.length > 0) {
-                        root.lastError = i18n("%1 contenedores fallaron al reiniciar", d.failed.length);
+                        root.lastError = qsTr("%1 contenedores fallaron al reiniciar").arg(d.failed.length);
                     }
                 } catch (e) {}
             }
@@ -927,11 +919,11 @@ IconButton {
         };
         xhr.ontimeout = function() {
             root.busy = false;
-            root.lastError = i18n("Tiempo de espera agotado");
+            root.lastError = qsTr("Tiempo de espera agotado");
         };
         xhr.onerror = function() {
             root.busy = false;
-            root.lastError = i18n("Sin conexión con el backend");
+            root.lastError = qsTr("Sin conexión con el backend");
         };
         xhr.send();
     }
@@ -952,7 +944,7 @@ IconButton {
                 try {
                     parsed = JSON.parse(xhr.responseText);
                 } catch (e) {}
-                root.lastError = parsed.error || i18n("No se pudo %1 «%2»", action, name);
+                root.lastError = parsed.error || qsTr("No se pudo %1 «%2»").arg(action).arg(name);
             } else {
                 if (action === "remove" && root.currentPage === 1) {
                     root.currentPage = 0;
@@ -964,11 +956,11 @@ IconButton {
         };
         xhr.ontimeout = function() {
             root.busy = false;
-            root.lastError = i18n("Tiempo de espera agotado");
+            root.lastError = qsTr("Tiempo de espera agotado");
         };
         xhr.onerror = function() {
             root.busy = false;
-            root.lastError = i18n("Sin conexión con el backend");
+            root.lastError = qsTr("Sin conexión con el backend");
         };
         xhr.send();
     }

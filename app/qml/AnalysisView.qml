@@ -41,7 +41,7 @@ Item {
         }
         var txt = finding.targets.join(", ");
         if (finding.targetCount > finding.targets.length) {
-            txt += i18n(" (+%1 más)", finding.targetCount - finding.targets.length);
+            txt += qsTr(" (+%1 más)").arg(finding.targetCount - finding.targets.length);
         }
         return txt;
     }
@@ -67,8 +67,8 @@ Item {
         spacing: Kirigami.Units.smallSpacing
 
         PageHeader {
-            title: i18n("Análisis")
-            refreshTooltip: i18n("Volver a medir")
+            title: qsTr("Análisis")
+            refreshTooltip: qsTr("Volver a medir")
             onBack: analysisPage.back()
             onRefreshRequested: analysisPage.refreshRequested()
         }
@@ -86,7 +86,7 @@ Item {
             Text {
                 anchors.centerIn: parent
                 visible: analysisPage.loading
-                text: i18n("Analizando disco y contenedores…\n(puede tardar unos segundos)")
+                text: qsTr("Analizando disco y contenedores…\n(puede tardar unos segundos)")
                 color: DS.subText
                 width: parent.width - Kirigami.Units.largeSpacing * 2
                 wrapMode: Text.WordWrap
@@ -134,7 +134,7 @@ Item {
                             spacing: 3
 
                             Text {
-                                text: i18n("Espacio en disco")
+                                text: qsTr("Espacio en disco")
                                 color: DS.subText
                                 font.bold: true
                                 font.letterSpacing: 0.5
@@ -176,7 +176,7 @@ Item {
                                         text: {
                                             var entry = analysisPage.summary[modelData.key];
                                             return entry && entry.reclaimBytes > 0
-                                                ? i18n("−%1", entry.reclaimable) : "";
+                                                ? qsTr("−%1").arg(entry.reclaimable) : "";
                                         }
                                         color: DS.orange
                                         font.pixelSize: 11
@@ -195,8 +195,8 @@ Item {
 
                             Text {
                                 visible: analysisPage.reclaimableBytes > 0
-                                text: i18n("Se pueden liberar %1",
-                                    analysisPage.fmtBytes(analysisPage.reclaimableBytes))
+                                text: qsTr("Se pueden liberar %1")
+                                    .arg(analysisPage.fmtBytes(analysisPage.reclaimableBytes))
                                 color: DS.green
                                 font.bold: true
                                 font.pixelSize: 12
@@ -206,7 +206,7 @@ Item {
                     }
 
                     Text {
-                        text: i18n("HALLAZGOS")
+                        text: qsTr("HALLAZGOS")
                         color: DS.subText
                         font.bold: true
                         font.letterSpacing: 0.5
@@ -218,7 +218,7 @@ Item {
                     Text {
                         Layout.fillWidth: true
                         visible: !analysisPage.loading && analysisPage.findings.length === 0
-                        text: i18n("Nada que objetar: todo en orden.\nSin imágenes sin usar, volúmenes huérfanos ni contenedores parados.")
+                        text: qsTr("Nada que objetar: todo en orden.\nSin imágenes sin usar, volúmenes huérfanos ni contenedores parados.")
                         color: DS.subText
                         wrapMode: Text.WordWrap
                         font.pixelSize: Kirigami.Theme.smallFont.pixelSize
@@ -305,24 +305,24 @@ Item {
                                                 ? DS.orange : DS.accentText
                                             accent: !modelData.aggressive
                                             onClicked: {
-                                                var subtitle = i18n("Comando: %1", modelData.command);
+                                                var subtitle = qsTr("Comando: %1").arg(modelData.command);
                                                 if (modelData.aggressive) {
-                                                    subtitle += "\n\n" + i18n("Acción agresiva: las imágenes que no use ningún contenedor habrá que volver a descargarlas.");
+                                                    subtitle += "\n\n" + qsTr("Acción agresiva: las imágenes que no use ningún contenedor habrá que volver a descargarlas.");
                                                 } else {
-                                                    subtitle += "\n\n" + i18n("No afecta a los contenedores en marcha.");
+                                                    subtitle += "\n\n" + qsTr("No afecta a los contenedores en marcha.");
                                                 }
                                                 analysisPage.requestMaintain(
                                                     modelData.target,
-                                                    i18n("¿Ejecutar «%1»?", modelData.command),
+                                                    qsTr("¿Ejecutar «%1»?").arg(modelData.command),
                                                     subtitle,
-                                                    i18n("Ejecutar"));
+                                                    qsTr("Ejecutar"));
                                             }
                                         }
                                     }
 
                                     ChipButton {
                                         visible: (card.finding.hint || "") !== ""
-                                        text: i18n("Copiar comando")
+                                        text: qsTr("Copiar comando")
                                         icon: Qt.resolvedUrl("../images/icons/copy.svg")
                                         onClicked: analysisPage.copyText(card.finding.hint)
                                     }

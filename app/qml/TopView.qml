@@ -44,12 +44,12 @@ Item {
 
         PageHeader {
             title: topPage.containerName
-            backTooltip: i18n("Volver al detalle")
+            backTooltip: qsTr("Volver al detalle")
             onBack: topPage.back()
             onRefreshRequested: topPage.refreshRequested()
 
             ChipButton {
-                text: i18n("Copiar")
+                text: qsTr("Copiar")
                 icon: Qt.resolvedUrl("../images/icons/copy.svg")
                 enabled: topPage.rows.length > 0
                 onClicked: topPage.asText()
@@ -69,7 +69,7 @@ Item {
             Text {
                 anchors.centerIn: parent
                 visible: topPage.loading
-                text: i18n("Leyendo procesos…")
+                text: qsTr("Leyendo procesos…")
                 color: DS.subText
                 font.pixelSize: Kirigami.Theme.defaultFont.pixelSize
             }
@@ -88,7 +88,7 @@ Item {
             Text {
                 anchors.centerIn: parent
                 visible: !topPage.loading && topPage.error === "" && topPage.rows.length === 0
-                text: i18n("Sin procesos en marcha")
+                text: qsTr("Sin procesos en marcha")
                 color: DS.subText
                 font.pixelSize: Kirigami.Theme.defaultFont.pixelSize
             }
@@ -161,7 +161,7 @@ Item {
                     Text {
                         Layout.fillWidth: true
                         visible: topPage.processData && topPage.processData.truncated
-                        text: i18n("Se muestran las primeras 200 líneas; usa «Copiar» para el resto.")
+                        text: qsTr("Se muestran las primeras 200 líneas; usa «Copiar» para el resto.")
                         color: DS.faint
                         font.pixelSize: 10
                         wrapMode: Text.WordWrap
