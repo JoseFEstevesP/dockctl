@@ -13,19 +13,19 @@ pkgver=1.2.0
 pkgrel=1
 pkgdesc="App de bandeja para ver y gestionar los contenedores Docker"
 arch=('any')
-url="https://github.com/JoseFEstevesP/plasma-dockctl"
+url="https://github.com/JoseFEstevesP/dockctl"
 license=('GPL-3.0')
 depends=('python' 'pyside6' 'kirigami' 'docker')
 source=("git+${url}.git#tag=v${pkgver}")
 sha256sums=('SKIP')
 
 pkgver() {
-  cd "${srcdir}/plasma-dockctl"
+  cd "${srcdir}/dockctl"
   printf '%s' "$(git describe --tags --always | sed 's/^v//')"
 }
 
 package() {
-  cd "${srcdir}/plasma-dockctl"
+  cd "${srcdir}/dockctl"
 
   install -d "${pkgdir}/usr/lib/dockctl"
   cp -a app/qml "${pkgdir}/usr/lib/dockctl/qml"
